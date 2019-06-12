@@ -1,6 +1,10 @@
 ﻿using Microsoft.Office.Tools.Ribbon;
 using Excel = Microsoft.Office.Interop.Excel;
 using System.Runtime.InteropServices;
+using MultiChartsCppWrapper;
+using System;
+using System.Collections.Generic;
+using System.IO;
 
 namespace ExcelAddIn5
 {
@@ -10,58 +14,6 @@ namespace ExcelAddIn5
         {
 
         }
-                                                                /*******    DLL Import   ********/
-                                                               
-
-        private const string dllAddress = "C:\\Users\\HPCS\\Documents\\Visual Studio 2015\\Projects\\MultiChartsProject\\MultiChartsDLL\\x64\\Release\\MultiChartsDLL.dll";
-
-        [DllImport(dllAddress, CallingConvention = CallingConvention.Cdecl, EntryPoint = "??1MultiCharts@@QEAA@XZ")]
-        public static extern void DisposeMultiCharts();
-
-        [DllImport(dllAddress, CallingConvention = CallingConvention.Cdecl, EntryPoint = "?InitTrainingData@MultiCharts@@QEAAXH@Z")]
-        public static extern void InitTrainingData( int size);
-
-        [DllImport(dllAddress, CallingConvention = CallingConvention.Cdecl, EntryPoint = "?SetTrainingData@MultiCharts@@QEAAXPEAN@Z")]
-        public static extern void SetTrainingData(double[] trainingData);
-
-        [DllImport(dllAddress, CallingConvention = CallingConvention.Cdecl, EntryPoint = "?InitDateArray@MultiCharts@@QEAAXH@Z")]
-        public static extern double InitDateArray( int size);
-
-        [DllImport(dllAddress, CallingConvention = CallingConvention.Cdecl, EntryPoint = "?InitFileName@MultiCharts@@QEAAXH@Z")]
-        public static extern double InitFileName(int size);
-
-        [DllImport(dllAddress, CallingConvention = CallingConvention.Cdecl, EntryPoint = "?InitVolumeArray@MultiCharts@@QEAAXH@Z")]
-        public static extern double InitVolumeArray(int size);
-
-        [DllImport(dllAddress, CallingConvention = CallingConvention.Cdecl, EntryPoint = "?SetDateArray@MultiCharts@@QEAAXPEAD@Z")]
-        public static extern void SetDateArray( char[] dateArray);
-
-        [DllImport(dllAddress, CallingConvention = CallingConvention.Cdecl, EntryPoint = "?SetEpochs@MultiCharts@@QEAAXH@Z")]
-        public static extern void SetEpochs(int epochs);
-
-        [DllImport(dllAddress, CallingConvention = CallingConvention.Cdecl, EntryPoint = "?SetFileName@MultiCharts@@QEAAXPEAD@Z")]
-        public static extern void SetFileName(char filename);
-
-        [DllImport(dllAddress, CallingConvention = CallingConvention.Cdecl, EntryPoint = "?SetLearningRate@MultiCharts@@QEAAXN@Z")]
-        public static extern void SetlearningRate(double learningRate);
-
-        [DllImport(dllAddress, CallingConvention = CallingConvention.Cdecl, EntryPoint = "?SetMomentum@MultiCharts@@QEAAXH@Z")]
-        public static extern void SetMomentum(int momentum);
-
-        [DllImport(dllAddress, CallingConvention = CallingConvention.Cdecl, EntryPoint = "?SetOptimizer@MultiCharts@@QEAAXH@Z")]
-        public static extern void SetOptimizer(int optimizer);
-
-        [DllImport(dllAddress, CallingConvention = CallingConvention.Cdecl, EntryPoint = "??SetScale@MultiCharts@@QEAAXH@Z")]
-        public static extern void SetScale(int scale );
-
-        [DllImport(dllAddress, CallingConvention = CallingConvention.Cdecl, EntryPoint = "?SetVolumeArray@MultiCharts@@QEAAXPEAJ@Z")]
-        public static extern void SetVolumeArray(long volume);
-
-        [DllImport(dllAddress, CallingConvention = CallingConvention.Cdecl, EntryPoint = "?TrainModel@MultiCharts@@QEAANXZ")]
-        public static extern double TrainModel();
-
-        
-
                                                                 /************  FORECAST BUTTON  ************/
 
            
@@ -199,6 +151,40 @@ namespace ExcelAddIn5
                         case open:                              // Case for "OPEN" Training Data
                             price = DataRange3.Value2;
                             OutRange3.Value2 = price;
+                            MultiChartsWrapper multiCharts = new MultiChartsWrapper();
+
+                            double[] trainingData = new double[(int)size];
+                            for(int i = 1; i < size + 1; i++)
+                            {
+                                trainingData[i-1] = Double.Parse(price[i,1].ToString());
+                            }
+                            multiCharts.SetTrainingData(trainingData);
+                            
+                            long[] dateArray = new long[(int)size];
+                            for (int i = 1; i < size + 1; i++)
+                            {
+                                dateArray[i - 1] = (Int64)(DateTime.Parse(string.Join(" ",date[i, 1].ToString(), TimeSpan.FromDays(Double.Parse(time[i,1].ToString
+                                    ()))).ToString()).Subtract(new DateTime(1970,1,1,5,30,0)).TotalSeconds);
+                            }
+                            multiCharts.SetDateArrayUNIX(dateArray);
+
+                            multiCharts.SetFileName("modelLSTM");
+                            multiCharts.SetEpochs(2);
+                            multiCharts.SetScale(100);
+                            multiCharts.SetLearningRate(0.0001);
+                            multiCharts.SetMomentum(100);
+                            multiCharts.SetOptimizer(0);
+
+                            double res = multiCharts.TrainModel();
+
+                            List<string> dataList = new List<string>{"asas","asajs","as1","a12ajs"};
+
+                            TextWriter tw = new StreamWriter("export.txt");
+                            foreach (String s in dataList)
+                                tw.WriteLine(s);
+                            tw.Close();
+
+                            OutputSheet.Cells[2, 15] = res;
                             break;
 
                         case high:                              // Case for "HIGH" Training Data 
@@ -505,21 +491,6 @@ namespace ExcelAddIn5
                 {
 
                 }
-                InitTrainingData((int)size);
-                InitDateArray((int)size);                            // issue -indicator values don't comes up on output sheet(if uncommented)
-                InitFileName((int)size);
-                InitVolumeArray((int)size);
-
-                
-                SetlearningRate(learningrate);
-                SetEpochs(Epochs);
-                SetScale(Scale);                                      
-                SetOptimizer(Optimizer);
-                SetMomentum(momentum);
-               
-
-
-
             }
         }
         
