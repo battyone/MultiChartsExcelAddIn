@@ -1,10 +1,12 @@
 ﻿using Microsoft.Office.Tools.Ribbon;
 using Excel = Microsoft.Office.Interop.Excel;
-using System.Runtime.InteropServices;
 using MultiChartsCppWrapper;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Diagnostics;
+using System.Windows.Forms;
+using System.Text;
 
 namespace ExcelAddIn5
 {
@@ -14,9 +16,24 @@ namespace ExcelAddIn5
         {
 
         }
-                                                                /************  FORECAST BUTTON  ************/
 
-           
+        /************  TRAIN BUTTON  ************/
+
+        private void Train_Click(object sender, RibbonControlEventArgs e)
+        {
+
+        }
+
+        /************  TEST BUTTON  ************/
+
+        private void Test_Click(object sender, RibbonControlEventArgs e)
+        {
+
+        }
+
+        /************  FORECAST BUTTON  ************/
+
+
         private void Forecast_Click(object sender, RibbonControlEventArgs e)
         {
             Excel.Workbook actbook = Globals.ThisAddIn.Application.ActiveWorkbook;
@@ -133,10 +150,56 @@ namespace ExcelAddIn5
             object[,] time = new object[(int)size, 1];
             object[,] value = new object[(int)size, 1];
 
+            price = DataRange3.Value2;
+            OutRange3.Value2 = price;
+
+            date = DataSheet.Range[DataSheet.Cells[2, 1], DataSheet.Cells[(int)size + 1, 1]].Value2;
+            time = DataSheet.Range[DataSheet.Cells[2, 2], DataSheet.Cells[(int)size + 1, 2]].Value2;
+
+            double[] trainingData = new double[(int)size];
+            for (int i = 1; i < size + 1; i++)
+            {
+                trainingData[i - 1] = Double.Parse(price[i, 1].ToString());
+            }
+
+            long[] dateArray = new long[(int)size];
+            for (int i = 1; i < size + 1; i++)
+            {
+                dateArray[i - 1] = (Int64)(DateTime.Parse(string.Join(" ", date[i, 1].ToString(), TimeSpan.FromDays(Double.Parse(time[i, 1].ToString
+                    ()))).ToString()).Subtract(new DateTime(1970, 1, 1, 5, 30, 0)).TotalSeconds);
+            }
+
+            StringBuilder sb = new StringBuilder();
+            foreach (double t_data_ele in trainingData)
+            {
+                sb.Append(t_data_ele);
+                sb.Append(',');
+            }
+            sb.Remove(sb.Length - 1,1);
+            sb.Append(';');
+
+            foreach (long t_date_ele in dateArray)
+            {
+                sb.Append(t_date_ele);
+                sb.Append(',');
+            }
+            sb.Remove(sb.Length - 1, 1);
+            sb.Append(';');
+
+            sb.Append("modelEXE;2;0.001;100;100;0");
+
+
+            //OpenFileDialog openFileDialog = new OpenFileDialog();
+            //if (openFileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            //{
+            //    string FilePath = openFileDialog.FileName;
+            //    Process.Start(FilePath, sb.ToString()).WaitForExit();
+            //}
+
+            Process.Start("MultiChartsClientCS.exe", sb.ToString()).WaitForExit();
+
             if (Train == "Yes")
             {
-                date = DataSheet.Range[DataSheet.Cells[2, 1], DataSheet.Cells[(int)size + 1, 1]].Value2;
-                time = DataSheet.Range[DataSheet.Cells[2, 2], DataSheet.Cells[(int)size + 1, 2]].Value2;
 
             Start:
                 if (Mode == "LSTM")
@@ -149,42 +212,7 @@ namespace ExcelAddIn5
                     switch (Training_data)
                     {
                         case open:                              // Case for "OPEN" Training Data
-                            price = DataRange3.Value2;
-                            OutRange3.Value2 = price;
-                            MultiChartsWrapper multiCharts = new MultiChartsWrapper();
-
-                            double[] trainingData = new double[(int)size];
-                            for(int i = 1; i < size + 1; i++)
-                            {
-                                trainingData[i-1] = Double.Parse(price[i,1].ToString());
-                            }
-                            multiCharts.SetTrainingData(trainingData);
                             
-                            long[] dateArray = new long[(int)size];
-                            for (int i = 1; i < size + 1; i++)
-                            {
-                                dateArray[i - 1] = (Int64)(DateTime.Parse(string.Join(" ",date[i, 1].ToString(), TimeSpan.FromDays(Double.Parse(time[i,1].ToString
-                                    ()))).ToString()).Subtract(new DateTime(1970,1,1,5,30,0)).TotalSeconds);
-                            }
-                            multiCharts.SetDateArrayUNIX(dateArray);
-
-                            multiCharts.SetFileName("modelLSTM");
-                            multiCharts.SetEpochs(2);
-                            multiCharts.SetScale(100);
-                            multiCharts.SetLearningRate(0.0001);
-                            multiCharts.SetMomentum(100);
-                            multiCharts.SetOptimizer(0);
-
-                            double res = multiCharts.TrainModel();
-
-                            List<string> dataList = new List<string>{"asas","asajs","as1","a12ajs"};
-
-                            TextWriter tw = new StreamWriter("export.txt");
-                            foreach (String s in dataList)
-                                tw.WriteLine(s);
-                            tw.Close();
-
-                            OutputSheet.Cells[2, 15] = res;
                             break;
 
                         case high:                              // Case for "HIGH" Training Data 
@@ -494,7 +522,7 @@ namespace ExcelAddIn5
             }
         }
         
-                                                          /**************  DELETE BUTTON  ***************/
+        /**************  DELETE BUTTON  ***************/
 
         private void Delete_Click(object sender, RibbonControlEventArgs e)
         {
@@ -514,5 +542,6 @@ namespace ExcelAddIn5
             OutRange.Clear();
             ErrorRange.Clear();
         }
+
     }
 }

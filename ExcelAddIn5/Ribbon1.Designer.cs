@@ -37,6 +37,8 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Ribbon1));
             this.tab1 = this.Factory.CreateRibbonTab();
             this.Trade = this.Factory.CreateRibbonGroup();
+            this.Train = this.Factory.CreateRibbonButton();
+            this.Test = this.Factory.CreateRibbonButton();
             this.Forecast = this.Factory.CreateRibbonButton();
             this.Manage_Data = this.Factory.CreateRibbonGroup();
             this.Clear_Output = this.Factory.CreateRibbonButton();
@@ -54,9 +56,29 @@
             // 
             // Trade
             // 
+            this.Trade.Items.Add(this.Train);
+            this.Trade.Items.Add(this.Test);
             this.Trade.Items.Add(this.Forecast);
             this.Trade.Label = "Trade";
             this.Trade.Name = "Trade";
+            // 
+            // Train
+            // 
+            this.Train.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge;
+            this.Train.Image = ((System.Drawing.Image)(resources.GetObject("Train.Image")));
+            this.Train.Label = "Train";
+            this.Train.Name = "Train";
+            this.Train.ShowImage = true;
+            this.Train.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.Train_Click);
+            // 
+            // Test
+            // 
+            this.Test.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge;
+            this.Test.Image = ((System.Drawing.Image)(resources.GetObject("Test.Image")));
+            this.Test.Label = "Test";
+            this.Test.Name = "Test";
+            this.Test.ShowImage = true;
+            this.Test.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.Test_Click);
             // 
             // Forecast
             // 
@@ -105,6 +127,8 @@
         internal Microsoft.Office.Tools.Ribbon.RibbonButton Forecast;
         internal Microsoft.Office.Tools.Ribbon.RibbonGroup Manage_Data;
         internal Microsoft.Office.Tools.Ribbon.RibbonButton Clear_Output;
+        internal Microsoft.Office.Tools.Ribbon.RibbonButton Train;
+        internal Microsoft.Office.Tools.Ribbon.RibbonButton Test;
     }
 
     partial class ThisRibbonCollection
