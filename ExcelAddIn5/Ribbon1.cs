@@ -186,8 +186,7 @@ namespace ExcelAddIn5
             sb.Remove(sb.Length - 1, 1);
             sb.Append(';');
 
-            sb.Append("modelEXE;2;0.001;100;100;0");
-
+            sb.Append("modelEXE;50;0.001;100;100;0");
 
             //OpenFileDialog openFileDialog = new OpenFileDialog();
             //if (openFileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
@@ -195,8 +194,9 @@ namespace ExcelAddIn5
             //    string FilePath = openFileDialog.FileName;
             //    Process.Start(FilePath, sb.ToString()).WaitForExit();
             //}
+            string filePath = "C:\\Users\\magic\\source\\repos\\MultiChartsClientCS\\MultiChartsClientCS\\bin\\x64\\Release\\MultiChartsClientCS.exe";
 
-            Process.Start("MultiChartsClientCS.exe", sb.ToString()).WaitForExit();
+            Process.Start(filePath, sb.ToString()).WaitForExit();
 
             if (Train == "Yes")
             {
