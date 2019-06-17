@@ -150,69 +150,62 @@ namespace ExcelAddIn5
             object[,] time = new object[(int)size, 1];
             object[,] value = new object[(int)size, 1];
 
-            price = DataRange3.Value2;
-            OutRange3.Value2 = price;
-
-            date = DataSheet.Range[DataSheet.Cells[2, 1], DataSheet.Cells[(int)size + 1, 1]].Value2;
-            time = DataSheet.Range[DataSheet.Cells[2, 2], DataSheet.Cells[(int)size + 1, 2]].Value2;
-
-            double[] trainingData = new double[(int)size];
-            for (int i = 1; i < size + 1; i++)
-            {
-                trainingData[i - 1] = Double.Parse(price[i, 1].ToString());
-            }
-
-            long[] dateArray = new long[(int)size];
-            for (int i = 1; i < size + 1; i++)
-            {
-                dateArray[i - 1] = (Int64)(DateTime.Parse(string.Join(" ", date[i, 1].ToString(), TimeSpan.FromDays(Double.Parse(time[i, 1].ToString
-                    ()))).ToString()).Subtract(new DateTime(1970, 1, 1, 5, 30, 0)).TotalSeconds);
-            }
-
-            StringBuilder sb = new StringBuilder();
-            foreach (double t_data_ele in trainingData)
-            {
-                sb.Append(t_data_ele);
-                sb.Append(',');
-            }
-            sb.Remove(sb.Length - 1,1);
-            sb.Append(';');
-
-            foreach (long t_date_ele in dateArray)
-            {
-                sb.Append(t_date_ele);
-                sb.Append(',');
-            }
-            sb.Remove(sb.Length - 1, 1);
-            sb.Append(';');
-
-            sb.Append("modelEXE;50;0.001;100;100;0");
-
-            //OpenFileDialog openFileDialog = new OpenFileDialog();
-            //if (openFileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-            //{
-            //    string FilePath = openFileDialog.FileName;
-            //    Process.Start(FilePath, sb.ToString()).WaitForExit();
-            //}
-            string filePath = "C:\\Users\\magic\\source\\repos\\MultiChartsClientCS\\MultiChartsClientCS\\bin\\x64\\Release\\MultiChartsClientCS.exe";
-
-            Process.Start(filePath, sb.ToString()).WaitForExit();
-
+            
             if (Train == "Yes")
             {
-
-            Start:
                 if (Mode == "LSTM")
                 {
                     OutRange1.Value2 = date;
                     OutRange2.Value2 = time;
                     ErrorRange1.Value2 = date;
                     ErrorRange2.Value2 = time;
-                   
+
+                    price = DataRange3.Value2;
+                    OutRange3.Value2 = price;
+
+                    date = DataSheet.Range[DataSheet.Cells[2, 1], DataSheet.Cells[(int)size + 1, 1]].Value2;
+                    time = DataSheet.Range[DataSheet.Cells[2, 2], DataSheet.Cells[(int)size + 1, 2]].Value2;
+
                     switch (Training_data)
                     {
                         case open:                              // Case for "OPEN" Training Data
                             
+                            double[] trainingData = new double[(int)size];
+                            for (int i = 1; i < size + 1; i++)
+                            {
+                                trainingData[i - 1] = Double.Parse(price[i, 1].ToString());
+                            }
+
+                            long[] dateArray = new long[(int)size];
+                            for (int i = 1; i < size + 1; i++)
+                            {
+                                dateArray[i - 1] = (Int64)(DateTime.Parse(string.Join(" ", date[i, 1].ToString(), TimeSpan.FromDays(Double.Parse(time[i, 1].ToString
+                                    ()))).ToString()).Subtract(new DateTime(1970, 1, 1, 5, 30, 0)).TotalSeconds);
+                            }
+
+                            StringBuilder sb = new StringBuilder();
+                            foreach (double t_data_ele in trainingData)
+                            {
+                                sb.Append(t_data_ele);
+                                sb.Append(',');
+                            }
+                            sb.Remove(sb.Length - 1, 1);
+                            sb.Append(';');
+
+                            foreach (long t_date_ele in dateArray)
+                            {
+                                sb.Append(t_date_ele);
+                                sb.Append(',');
+                            }
+                            sb.Remove(sb.Length - 1, 1);
+                            sb.Append(';');
+
+                            sb.Append("modelEXE;50;0.001;100;100;0");
+
+                            string filePath = "C:\\Users\\magic\\source\\repos\\MultiChartsClientCS\\MultiChartsClientCS\\bin\\x64\\Release\\MultiChartsClientCS.exe";
+
+                            Process.Start(filePath, sb.ToString()).WaitForExit();
+
                             break;
 
                         case high:                              // Case for "HIGH" Training Data 
@@ -320,13 +313,13 @@ namespace ExcelAddIn5
                 if (x == 5)
                 {
                     x = 0;
-                    goto end;
+                    //goto end;
                 }
                                                                       
                 if (Re_Train == "Yes")
                 {
                     x = 5;
-                    goto Start;
+                    //goto Start;
                 }
 
             end:
