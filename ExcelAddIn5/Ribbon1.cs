@@ -12,6 +12,8 @@ namespace ExcelAddIn5
 {
     public partial class Ribbon1
     {
+        Excel.Workbook actbook = Globals.ThisAddIn.Application.ActiveWorkbook;
+
         private void Ribbon1_Load(object sender, RibbonUIEventArgs e)
         {
 
@@ -36,8 +38,7 @@ namespace ExcelAddIn5
 
         private void Forecast_Click(object sender, RibbonControlEventArgs e)
         {
-            Excel.Workbook actbook = Globals.ThisAddIn.Application.ActiveWorkbook;
-
+            
             Excel.Worksheet InputSheet = actbook.Sheets[1];
 
             Excel.Worksheet DataSheet = actbook.Sheets[2];
