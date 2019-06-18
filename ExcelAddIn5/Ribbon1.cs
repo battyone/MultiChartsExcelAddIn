@@ -1,11 +1,7 @@
 ﻿using Microsoft.Office.Tools.Ribbon;
 using Excel = Microsoft.Office.Interop.Excel;
-using MultiChartsCppWrapper;
 using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Diagnostics;
-using System.Windows.Forms;
 using System.Text;
 
 namespace ExcelAddIn5
@@ -23,22 +19,8 @@ namespace ExcelAddIn5
 
         private void Train_Click(object sender, RibbonControlEventArgs e)
         {
+            Excel.Workbook actbook = Globals.ThisAddIn.Application.ActiveWorkbook;
 
-        }
-
-        /************  TEST BUTTON  ************/
-
-        private void Test_Click(object sender, RibbonControlEventArgs e)
-        {
-
-        }
-
-        /************  FORECAST BUTTON  ************/
-
-
-        private void Forecast_Click(object sender, RibbonControlEventArgs e)
-        {
-            
             Excel.Worksheet InputSheet = actbook.Sheets[1];
 
             Excel.Worksheet DataSheet = actbook.Sheets[2];
@@ -46,7 +28,7 @@ namespace ExcelAddIn5
             Excel.Worksheet IndicatorSheet = actbook.Sheets[3];
 
             Excel.Worksheet OutputSheet = actbook.Sheets[4];
-            
+
             Excel.Worksheet ErrorSheet = actbook.Sheets[6];
 
             double size = InputSheet.Cells[7, 2].Value2;
@@ -93,7 +75,7 @@ namespace ExcelAddIn5
             const string high = "High";
             const string low = "Low";
             const string close = "Close";
-                                                                  /****  Indicator Variables  ****/
+            /****  Indicator Variables  ****/
             const string AC = "AC";
             const string AD = "AD";
             const string ADX = "ADX";
@@ -127,92 +109,50 @@ namespace ExcelAddIn5
             int x = 0;
 
             string gpu = InputSheet.Cells[3, 2].Value2;             // GPU - Enable / Disable
-            string Train = InputSheet.Cells[4, 2].Value2;           // Train - Yes / No
+            string isTrain = InputSheet.Cells[4, 2].Value2;         // Train - Yes / No
             string Re_Train = InputSheet.Cells[5, 2].Value2;        // Re-Train - Yes / No
-            string En_Indi = InputSheet.Cells[18, 2].Value2;        // Enable Indicator - Enable / Disable
+            string En_Indi = InputSheet.Cells[19, 2].Value2;        // Enable Indicator - Enable / Disable
 
-            string Training_data = InputSheet.Cells[6, 2].Value2;   // Training Data - O, H, L, C
-            string Mode = InputSheet.Cells[13, 2].Value2;           // Training Mode - LSTM / GRNN / BP
-            string Model = InputSheet.Cells[14, 2].Value2;          // Training Model - MSQ / RSQ / CORL
-            string Ch_Indi = InputSheet.Cells[19, 2].Value2;        // Choose a Indicator( applied when Indicator is Enabled)
-            string Reg_cls = InputSheet.Cells[20, 2].Value2;        // Regression / classification
-            
-            double learningrate = (double)InputSheet.Cells[9, 2].Value2;     // Learning Rate
-            int Epochs = (int)InputSheet.Cells[10, 2].Value2;            // Epochs
-            int Scale = (int)InputSheet.Cells[11, 2].Value2;             // Scale                                  // issue - Output don't comes up (D,T,O, H, L,C,I)
-            int Optimizer = (int)InputSheet.Cells[12, 2].Value2;         // Optimizer
-            int momentum = (int)InputSheet.Cells[15, 2].Value2;          // Momentum
-            int Maxbars = (int)InputSheet.Cells[16, 2].Value2;           // Maxbars
-            int Minbars = (int)InputSheet.Cells[17, 2].Value2;           // Minbars
-            
-          
+            string FileName = InputSheet.Cells[8, 2].Value2;
+            string Training_data = InputSheet.Cells[6, 2].Value2;          // Training Data - O, H, L, C
+            string Architecture = InputSheet.Cells[13, 2].Value2;          // Training Model - LSTM / GRU
+            string Optimizer = InputSheet.Cells[15, 2].Value2;             // Optimizer - MSQ / RSQ / CORL
+            string Ch_Indi = InputSheet.Cells[20, 2].Value2;               // Choose a Indicator( applied when Indicator is Enabled)
+            string Reg_cls = InputSheet.Cells[21, 2].Value2;               // Regression / classification
+
+            double learningrate = (double)InputSheet.Cells[9, 2].Value2;   // Learning Rated
+            double testingPart = (double)InputSheet.Cells[12, 2].Value2;   // Testing Part (in %)
+            double testingWeight = (double)InputSheet.Cells[13,2].Value2;  // Testing Weight (in %)
+            double momentum = (double)InputSheet.Cells[16, 2].Value2;      // Momentum
+            int Epochs = (int)InputSheet.Cells[10, 2].Value2;              // Epochs
+            int Scale = (int)InputSheet.Cells[11, 2].Value2;               // Scale             
+            int Maxbars = (int)InputSheet.Cells[18, 2].Value2;             // Maxbars
+            int Minbars = (int)InputSheet.Cells[17, 2].Value2;             // Minbars
+
             object[,] price = new object[(int)size, 1];
             object[,] date = new object[(int)size, 1];
             object[,] time = new object[(int)size, 1];
             object[,] value = new object[(int)size, 1];
 
-            price = DataRange3.Value2;
-            OutRange3.Value2 = price;
-
-            date = DataSheet.Range[DataSheet.Cells[2, 1], DataSheet.Cells[(int)size + 1, 1]].Value2;
-            time = DataSheet.Range[DataSheet.Cells[2, 2], DataSheet.Cells[(int)size + 1, 2]].Value2;
-
-            double[] trainingData = new double[(int)size];
-            for (int i = 1; i < size + 1; i++)
+            if (isTrain == "Yes")
             {
-                trainingData[i - 1] = Double.Parse(price[i, 1].ToString());
-            }
-
-            long[] dateArray = new long[(int)size];
-            for (int i = 1; i < size + 1; i++)
-            {
-                dateArray[i - 1] = (Int64)(DateTime.Parse(string.Join(" ", date[i, 1].ToString(), TimeSpan.FromDays(Double.Parse(time[i, 1].ToString
-                    ()))).ToString()).Subtract(new DateTime(1970, 1, 1, 5, 30, 0)).TotalSeconds);
-            }
-
-            StringBuilder sb = new StringBuilder();
-            foreach (double t_data_ele in trainingData)
-            {
-                sb.Append(t_data_ele);
-                sb.Append(',');
-            }
-            sb.Remove(sb.Length - 1,1);
-            sb.Append(';');
-
-            foreach (long t_date_ele in dateArray)
-            {
-                sb.Append(t_date_ele);
-                sb.Append(',');
-            }
-            sb.Remove(sb.Length - 1, 1);
-            sb.Append(';');
-
-            sb.Append("modelEXE;50;0.001;100;100;0");
-
-            //OpenFileDialog openFileDialog = new OpenFileDialog();
-            //if (openFileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-            //{
-            //    string FilePath = openFileDialog.FileName;
-            //    Process.Start(FilePath, sb.ToString()).WaitForExit();
-            //}
-            string filePath = "C:\\Users\\magic\\source\\repos\\MultiChartsClientCS\\MultiChartsClientCS\\bin\\x64\\Release\\MultiChartsClientCS.exe";
-
-            Process.Start(filePath, sb.ToString()).WaitForExit();
-
-            if (Train == "Yes")
-            {
-
-            Start:
-                if (Mode == "LSTM")
+                if (Architecture == "LSTM")
                 {
                     OutRange1.Value2 = date;
                     OutRange2.Value2 = time;
                     ErrorRange1.Value2 = date;
                     ErrorRange2.Value2 = time;
-                   
+
+
+                    date = DataSheet.Range[DataSheet.Cells[2, 1], DataSheet.Cells[(int)size + 1, 1]].Value2;
+                    time = DataSheet.Range[DataSheet.Cells[2, 2], DataSheet.Cells[(int)size + 1, 2]].Value2;
+
                     switch (Training_data)
                     {
-                        case open:                              // Case for "OPEN" Training Data
+                        case open:                            // Case for "OPEN" Training Data
+
+                            price = DataRange3.Value2;
+                            OutRange3.Value2 = price;
                             
                             break;
 
@@ -233,7 +173,7 @@ namespace ExcelAddIn5
                     }
                 }
 
-                if (Mode == "GRNN")
+                if (Architecture == "GRU")
                 {
                     OutRange1.Value2 = date;
                     OutRange2.Value2 = time;
@@ -264,41 +204,45 @@ namespace ExcelAddIn5
 
                     }
                 }
-               
-                if (Mode == "BP")
+
+                double[] trainingData = new double[(int)size];
+                for (int i = 1; i < size + 1; i++)
                 {
-                    OutRange1.Value2 = date;
-                    OutRange2.Value2 = time;
-                    ErrorRange1.Value2 = date;
-                    ErrorRange2.Value2 = time;
-
-                    switch (Training_data)
-                    {
-                        case open:                              // Case for "OPEN" Training Data
-                            price = DataRange3.Value2;
-                            OutRange3.Value2 = price;
-                            break;
-
-                        case high:                              // Case for "HIGH" Training Data 
-                            price = DataRange4.Value2;
-                            OutRange4.Value2 = price;
-                            break;
-
-                        case low:                               // Case for "LOW" Training Data
-                            price = DataRange5.Value2;
-                            OutRange5.Value2 = price;
-                            break;
-
-                        case close:                             // Case for "CLOSE" Training Data
-                            price = DataRange6.Value2;
-                            OutRange6.Value2 = price;
-                            break;
-                    }
+                    trainingData[i - 1] = Double.Parse(price[i, 1].ToString());
                 }
-                                                                    /*****  DLL Calls  *****/
-                
-                                
-                                                                   /******  Error Analysis  ******/
+
+                long[] dateArray = new long[(int)size];
+                for (int i = 1; i < size + 1; i++)
+                {
+                    dateArray[i - 1] = (Int64)(DateTime.Parse(string.Join(" ", date[i, 1].ToString(), TimeSpan.FromDays(Double.Parse(time[i, 1].ToString
+                        ()))).ToString()).Subtract(new DateTime(1970, 1, 1, 5, 30, 0)).TotalSeconds);
+                }
+
+                StringBuilder sb = new StringBuilder();
+                foreach (double t_data_ele in trainingData)
+                {
+                    sb.Append(t_data_ele);
+                    sb.Append(',');
+                }
+                sb.Remove(sb.Length - 1, 1);
+                sb.Append(';');
+
+                foreach (long t_date_ele in dateArray)
+                {
+                    sb.Append(t_date_ele);
+                    sb.Append(',');
+                }
+                sb.Remove(sb.Length - 1, 1);
+                sb.Append(';');
+
+                sb.Append("modelEXE;50;0.001;100;100;0");
+
+                string filePath = "C:\\Users\\magic\\source\\repos\\MultiChartsClientCS\\MultiChartsClientCS\\bin\\x64\\Release\\MultiChartsClientCS.exe";
+
+                Process.Start(filePath, sb.ToString()).WaitForExit();
+
+
+                /******  Error Analysis  ******/
 
 
 
@@ -312,22 +256,22 @@ namespace ExcelAddIn5
                     }
                 }
 
-                                                                         /*****  GPU  *****/
+                /*****  GPU  *****/
                 if (gpu == "Enabled")
                 {
 
                 }
-                                                                        /*****  Re-Train  *****/
+                /*****  Re-Train  *****/
                 if (x == 5)
                 {
                     x = 0;
-                    goto end;
+                    //goto end;
                 }
-                                                                      
+
                 if (Re_Train == "Yes")
                 {
                     x = 5;
-                    goto Start;
+                    //goto Start;
                 }
 
             end:
@@ -493,34 +437,27 @@ namespace ExcelAddIn5
                     }
                 }
 
-                /*********   Regression / Classification  *********/
-                if (Reg_cls == "Regression")
-                {
+                ///*********   Regression / Classification  *********/
+                //if (Reg_cls == "Regression")
+                //{
 
-                }
+                //}
 
-                if (Reg_cls == "Classification")
-                {
-                    if((OutputSheet.Cells[(int)size +1, 4 ]).Value2 > (OutputSheet.Cells[(int)size + 1, 4]).Value2)           // Check Close price
-                    { }
-                    else{ }
-                }
-                                                              /*********  Training Model  *************/
-                if (Model == "MSQ")
-                {
-
-                }
-
-                if (Model == "RSQ")
-                {
-
-                }
-
-                if (Model == "CORL")
-                {
-
-                }
+                //if (Reg_cls == "Classification")
+                //{
+                //    if ((OutputSheet.Cells[(int)size + 1, 4]).Value2 > (OutputSheet.Cells[(int)size + 1, 4]).Value2)           // Check Close price
+                //    { }
+                //    else { }
+                //}
             }
+        }
+
+        /************  FORECAST BUTTON  ************/
+
+
+        private void Forecast_Click(object sender, RibbonControlEventArgs e)
+        {
+
         }
         
         /**************  DELETE BUTTON  ***************/
@@ -544,5 +481,9 @@ namespace ExcelAddIn5
             ErrorRange.Clear();
         }
 
+        private void Retrieve_Click(object sender, RibbonControlEventArgs e)
+        {
+
+        }
     }
 }
