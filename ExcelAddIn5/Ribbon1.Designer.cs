@@ -88,7 +88,7 @@
             this.Evaluate.Label = "Evaluate";
             this.Evaluate.Name = "Evaluate";
             this.Evaluate.ShowImage = true;
-            this.Evaluate.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.button1_Click);
+            this.Evaluate.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.Evaluate_Click);
             // 
             // Manage_Data
             // 

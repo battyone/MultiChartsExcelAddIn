@@ -171,14 +171,6 @@ namespace ExcelAddIn5
 
             sb.Append("modelEXE;50;0.001;100;100;0");
 
-
-            //OpenFileDialog openFileDialog = new OpenFileDialog();
-            //if (openFileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-            //{
-            //    string FilePath = openFileDialog.FileName;
-            //    Process.Start(FilePath, sb.ToString()).WaitForExit();
-            //}
-
             Process.Start("C:\\Users\\magic\\source\\repos\\MultiChartsClientCS\\MultiChartsClientCS\\bin\\x64\\Release\\MultiChartsClientCS.exe", sb.ToString()).WaitForExit();
 
             if (isTrain == "Yes")
