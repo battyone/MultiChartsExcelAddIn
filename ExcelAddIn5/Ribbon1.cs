@@ -1,6 +1,7 @@
 ﻿using Microsoft.Office.Tools.Ribbon;
 using Excel = Microsoft.Office.Interop.Excel;
 using System;
+using System.IO;
 using System.Diagnostics;
 using System.Text;
 
@@ -113,7 +114,7 @@ namespace ExcelAddIn5
 
             string FileName = InputSheet.Cells[8, 2].Value2;
             string Training_data = InputSheet.Cells[6, 2].Value2;          // Training Data - O, H, L, C
-            string Architecture = InputSheet.Cells[13, 2].Value2;          // Training Model - LSTM / GRU
+            string Architecture = InputSheet.Cells[14, 2].Value2;          // Training Model - LSTM / GRU
             string Optimizer = InputSheet.Cells[15, 2].Value2;             // Optimizer - MSQ / RSQ / CORL
             string Ch_Indi = InputSheet.Cells[20, 2].Value2;               // Choose a Indicator( applied when Indicator is Enabled)
             string Reg_cls = InputSheet.Cells[21, 2].Value2;               // Regression / classification
@@ -126,7 +127,6 @@ namespace ExcelAddIn5
             int Scale = (int)InputSheet.Cells[11, 2].Value2;               // Scale             
             int Maxbars = (int)InputSheet.Cells[18, 2].Value2;             // Maxbars
             int Minbars = (int)InputSheet.Cells[17, 2].Value2;             // Minbars
-
 
             object[,] price = new object[(int)size, 1];
             object[,] date = new object[(int)size, 1];
@@ -153,6 +153,8 @@ namespace ExcelAddIn5
             }
 
             StringBuilder sb = new StringBuilder();
+            sb.Append("train;");
+
             foreach (double t_data_ele in trainingData)
             {
                 sb.Append(t_data_ele);
@@ -169,9 +171,17 @@ namespace ExcelAddIn5
             sb.Remove(sb.Length - 1, 1);
             sb.Append(';');
 
-            sb.Append("modelEXE;50;0.001;100;100;0");
+            sb.Append(FileName + ';');
+            sb.Append(Epochs.ToString() + ';');
+            sb.Append(learningrate.ToString() + ';');
+            sb.Append(momentum.ToString() + ';');
+            sb.Append(Scale.ToString() + ';');
+            sb.Append((Optimizer.Equals("RMSProp")?1:0).ToString() + ';');
+            sb.Append(testingPart.ToString() + ';');
+            sb.Append(testingWeight.ToString());
 
-            Process.Start("C:\\Users\\magic\\source\\repos\\MultiChartsClientCS\\MultiChartsClientCS\\bin\\x64\\Release\\MultiChartsClientCS.exe", sb.ToString()).WaitForExit();
+            Directory.SetCurrentDirectory("C:\\MultiCharts");
+            Process.Start(Path.Combine(Directory.GetCurrentDirectory(), "MultiChartsClientCS.exe"), sb.ToString());
 
             if (isTrain == "Yes")
             {
@@ -204,40 +214,7 @@ namespace ExcelAddIn5
                             break;
                     }
                 }
-
-                if (Architecture == "GRU")
-                {
-                    OutRange1.Value2 = date;
-                    OutRange2.Value2 = time;
-                    ErrorRange1.Value2 = date;
-                    ErrorRange2.Value2 = time;
-
-                    switch (Training_data)
-                    {
-                        case open:                              // Case for "OPEN" Training Data
-                            price = DataRange3.Value2;
-                            OutRange3.Value2 = price;
-                            break;
-
-                        case high:                              // Case for "HIGH" Training Data 
-                            price = DataRange4.Value2;
-                            OutRange4.Value2 = price;
-                            break;
-
-                        case low:                               // Case for "LOW" Training Data
-                            price = DataRange5.Value2;
-                            OutRange5.Value2 = price;
-                            break;
-
-                        case close:                             // Case for "CLOSE" Training Data
-                            price = DataRange6.Value2;
-                            OutRange6.Value2 = price;
-                            break;
-
-                    }
-                }
-
-
+                
                 /******  Error Analysis  ******/
 
 
@@ -416,19 +393,57 @@ namespace ExcelAddIn5
             }
         }
 
-        /************  FORECAST BUTTON  ************/
-
-
-        private void Forecast_Click(object sender, RibbonControlEventArgs e)
-        {
-            
-        }
-
         /************  EVALUATE BUTTON  ************/
 
         private void Evaluate_Click(object sender, RibbonControlEventArgs e)
         {
 
+        }
+
+        /************  FORECAST BUTTON  ************/
+
+        private void Forecast_Click(object sender, RibbonControlEventArgs e)
+        {
+            Excel.Workbook actbook = Globals.ThisAddIn.Application.ActiveWorkbook;
+
+            Excel.Worksheet InputSheet = actbook.Sheets[1];
+
+            Excel.Worksheet DataSheet = actbook.Sheets[2];
+
+            double size = InputSheet.Cells[7, 2].Value2;
+
+            Excel.Range DataRange1 = DataSheet.Range[DataSheet.Cells[2, 1], DataSheet.Cells[(int)size + 1, 1]];
+
+            Excel.Range DataRange2 = DataSheet.Range[DataSheet.Cells[2, 2], DataSheet.Cells[(int)size + 1, 2]];
+            
+            int ticks = (int)InputSheet.Cells[22, 2].Value2;               // Number of Bars to forecast
+            string FileName = InputSheet.Cells[8, 2].Value2;
+
+            object[,] date = new object[(int)size, 1];
+            object[,] time = new object[(int)size, 1];           
+
+            date = DataSheet.Range[DataSheet.Cells[2, 1], DataSheet.Cells[(int)size + 1, 1]].Value2;
+            time = DataSheet.Range[DataSheet.Cells[2, 2], DataSheet.Cells[(int)size + 1, 2]].Value2;
+
+            long lastDateTimeMinusOne = (Int64)(DateTime.Parse(string.Join(" ", date[(int)size - 2, 1].ToString(), TimeSpan.FromDays(Double.Parse(time[(int)size - 2, 1].ToString
+                    ()))).ToString()).Subtract(new DateTime(1970, 1, 1, 5, 30, 0)).TotalSeconds);
+
+            long lastDateTime = (Int64)(DateTime.Parse(string.Join(" ", date[(int)size - 1, 1].ToString(), TimeSpan.FromDays(Double.Parse(time[(int)size - 1, 1].ToString
+                    ()))).ToString()).Subtract(new DateTime(1970, 1, 1, 5, 30, 0)).TotalSeconds);
+
+            StringBuilder sb = new StringBuilder();
+            sb.Append("forecast;");            
+            sb.Append(ticks.ToString() + ';');
+            sb.Append(lastDateTime.ToString() + ';');
+            sb.Append((lastDateTime - lastDateTimeMinusOne).ToString() + ';');
+            sb.Append(FileName);
+
+            Directory.SetCurrentDirectory("C:\\MultiCharts");
+            Process.Start(Path.Combine(Directory.GetCurrentDirectory(), "MultiChartsClientCS.exe"), sb.ToString());
+
+            Prediction_Label.Label = "Predicted Values : ";
+            Display_Forecast.Visible = true;
+            Prediction_Label.Visible = true;
         }
 
         /**************  DELETE BUTTON  ***************/
@@ -450,11 +465,40 @@ namespace ExcelAddIn5
             OutputSheet.Cells[1, 7].ClearContents();
             OutRange.Clear();
             ErrorRange.Clear();
+
         }
+
+        /**************  RETRIEVE BUTTON  ***************/
 
         private void Retrieve_Click(object sender, RibbonControlEventArgs e)
         {
+            Excel.Workbook actbook = Globals.ThisAddIn.Application.ActiveWorkbook;
 
+            Excel.Worksheet DataSheet = actbook.Sheets[2];
+
+            int lastUsedRow = DataSheet.Cells.SpecialCells(Excel.XlCellType.xlCellTypeLastCell, Type.Missing).Row;
+            while (DataSheet.Cells[lastUsedRow, 1].Value2 == null)
+                lastUsedRow--;
+
+            String fileData = System.IO.File.ReadAllText(@"");
+
+            String[] lines = fileData.Split(new char[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
+
+            int totalRowsInFile = lines.Length;
+
+            int index = lastUsedRow;
+
+            while (index < totalRowsInFile)
+            {
+                String[] values = lines[index].Split(',');
+
+                for (int i = 0; i < 6; i++)
+                {
+                    DataSheet.Cells[index + 1, i+1] = values[i];
+                }
+
+                index++;
+            }
         }
     }
 }
