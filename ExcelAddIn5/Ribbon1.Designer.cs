@@ -38,9 +38,10 @@
             this.tab1 = this.Factory.CreateRibbonTab();
             this.Trade = this.Factory.CreateRibbonGroup();
             this.Train = this.Factory.CreateRibbonButton();
-            this.Test = this.Factory.CreateRibbonButton();
             this.Forecast = this.Factory.CreateRibbonButton();
+            this.Evaluate = this.Factory.CreateRibbonButton();
             this.Manage_Data = this.Factory.CreateRibbonGroup();
+            this.Retrieve_Data = this.Factory.CreateRibbonButton();
             this.Clear_Output = this.Factory.CreateRibbonButton();
             this.tab1.SuspendLayout();
             this.Trade.SuspendLayout();
@@ -57,7 +58,7 @@
             // Trade
             // 
             this.Trade.Items.Add(this.Train);
-            this.Trade.Items.Add(this.Test);
+            this.Trade.Items.Add(this.Evaluate);
             this.Trade.Items.Add(this.Forecast);
             this.Trade.Label = "Trade";
             this.Trade.Name = "Trade";
@@ -71,15 +72,6 @@
             this.Train.ShowImage = true;
             this.Train.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.Train_Click);
             // 
-            // Test
-            // 
-            this.Test.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge;
-            this.Test.Image = ((System.Drawing.Image)(resources.GetObject("Test.Image")));
-            this.Test.Label = "Test";
-            this.Test.Name = "Test";
-            this.Test.ShowImage = true;
-            this.Test.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.Test_Click);
-            // 
             // Forecast
             // 
             this.Forecast.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge;
@@ -89,11 +81,30 @@
             this.Forecast.ShowImage = true;
             this.Forecast.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.Forecast_Click);
             // 
+            // Evaluate
+            // 
+            this.Evaluate.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge;
+            this.Evaluate.Image = ((System.Drawing.Image)(resources.GetObject("Evaluate.Image")));
+            this.Evaluate.Label = "Evaluate";
+            this.Evaluate.Name = "Evaluate";
+            this.Evaluate.ShowImage = true;
+            this.Evaluate.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.button1_Click);
+            // 
             // Manage_Data
             // 
+            this.Manage_Data.Items.Add(this.Retrieve_Data);
             this.Manage_Data.Items.Add(this.Clear_Output);
             this.Manage_Data.Label = "Manage Data";
             this.Manage_Data.Name = "Manage_Data";
+            // 
+            // Retrieve_Data
+            // 
+            this.Retrieve_Data.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge;
+            this.Retrieve_Data.Image = ((System.Drawing.Image)(resources.GetObject("Retrieve_Data.Image")));
+            this.Retrieve_Data.Label = "Retrieve Data";
+            this.Retrieve_Data.Name = "Retrieve_Data";
+            this.Retrieve_Data.ShowImage = true;
+            this.Retrieve_Data.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.Retrieve_Click);
             // 
             // Clear_Output
             // 
@@ -128,7 +139,8 @@
         internal Microsoft.Office.Tools.Ribbon.RibbonGroup Manage_Data;
         internal Microsoft.Office.Tools.Ribbon.RibbonButton Clear_Output;
         internal Microsoft.Office.Tools.Ribbon.RibbonButton Train;
-        internal Microsoft.Office.Tools.Ribbon.RibbonButton Test;
+        internal Microsoft.Office.Tools.Ribbon.RibbonButton Retrieve_Data;
+        internal Microsoft.Office.Tools.Ribbon.RibbonButton Evaluate;
     }
 
     partial class ThisRibbonCollection
