@@ -1,4 +1,4 @@
-﻿namespace ExcelAddIn5
+namespace ExcelAddIn5
 {
     partial class Ribbon1 : Microsoft.Office.Tools.Ribbon.RibbonBase
     {
@@ -38,25 +38,31 @@
             this.tab1 = this.Factory.CreateRibbonTab();
             this.Trade = this.Factory.CreateRibbonGroup();
             this.Train = this.Factory.CreateRibbonButton();
+            this.Evaluate = this.Factory.CreateRibbonButton();
             this.Forecast = this.Factory.CreateRibbonButton();
             this.Manage_Data = this.Factory.CreateRibbonGroup();
             this.Retrieve_Data = this.Factory.CreateRibbonButton();
             this.Clear_Output = this.Factory.CreateRibbonButton();
+            this.Display_Forecast = this.Factory.CreateRibbonGroup();
+            this.Prediction_Label = this.Factory.CreateRibbonLabel();
             this.tab1.SuspendLayout();
             this.Trade.SuspendLayout();
             this.Manage_Data.SuspendLayout();
+            this.Display_Forecast.SuspendLayout();
             this.SuspendLayout();
             // 
             // tab1
             // 
             this.tab1.Groups.Add(this.Trade);
             this.tab1.Groups.Add(this.Manage_Data);
+            this.tab1.Groups.Add(this.Display_Forecast);
             this.tab1.Label = "HPCS";
             this.tab1.Name = "tab1";
             // 
             // Trade
             // 
             this.Trade.Items.Add(this.Train);
+            this.Trade.Items.Add(this.Evaluate);
             this.Trade.Items.Add(this.Forecast);
             this.Trade.Label = "Trade";
             this.Trade.Name = "Trade";
@@ -69,6 +75,15 @@
             this.Train.Name = "Train";
             this.Train.ShowImage = true;
             this.Train.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.Train_Click);
+            // 
+            // Evaluate
+            // 
+            this.Evaluate.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge;
+            this.Evaluate.Image = ((System.Drawing.Image)(resources.GetObject("Evaluate.Image")));
+            this.Evaluate.Label = "Evaluate";
+            this.Evaluate.Name = "Evaluate";
+            this.Evaluate.ShowImage = true;
+            this.Evaluate.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.Evaluate_Click);
             // 
             // Forecast
             // 
@@ -104,6 +119,19 @@
             this.Clear_Output.ShowImage = true;
             this.Clear_Output.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.Delete_Click);
             // 
+            // Display_Forecast
+            // 
+            this.Display_Forecast.Items.Add(this.Prediction_Label);
+            this.Display_Forecast.Label = "Predicted Values";
+            this.Display_Forecast.Name = "Display_Forecast";
+            this.Display_Forecast.Visible = false;
+            // 
+            // Prediction_Label
+            // 
+            this.Prediction_Label.Label = "Predictions";
+            this.Prediction_Label.Name = "Prediction_Label";
+            this.Prediction_Label.Visible = false;
+            // 
             // Ribbon1
             // 
             this.Name = "Ribbon1";
@@ -116,6 +144,8 @@
             this.Trade.PerformLayout();
             this.Manage_Data.ResumeLayout(false);
             this.Manage_Data.PerformLayout();
+            this.Display_Forecast.ResumeLayout(false);
+            this.Display_Forecast.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -124,12 +154,14 @@
 
         internal Microsoft.Office.Tools.Ribbon.RibbonTab tab1;
         internal Microsoft.Office.Tools.Ribbon.RibbonGroup Trade;
-        internal Microsoft.Office.Tools.Ribbon.RibbonButton Train;
         internal Microsoft.Office.Tools.Ribbon.RibbonButton Forecast;
         internal Microsoft.Office.Tools.Ribbon.RibbonGroup Manage_Data;
-        internal Microsoft.Office.Tools.Ribbon.RibbonButton Retrieve_Data;
         internal Microsoft.Office.Tools.Ribbon.RibbonButton Clear_Output;
-
+        internal Microsoft.Office.Tools.Ribbon.RibbonButton Train;
+        internal Microsoft.Office.Tools.Ribbon.RibbonButton Retrieve_Data;
+        internal Microsoft.Office.Tools.Ribbon.RibbonButton Evaluate;
+        internal Microsoft.Office.Tools.Ribbon.RibbonGroup Display_Forecast;
+        internal Microsoft.Office.Tools.Ribbon.RibbonLabel Prediction_Label;
     }
 
     partial class ThisRibbonCollection
