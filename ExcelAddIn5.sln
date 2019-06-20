@@ -8,17 +8,23 @@ EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
+		Debug|Default = Debug|Default
 		Debug|x64 = Debug|x64
 		Release|Any CPU = Release|Any CPU
+		Release|Default = Release|Default
 		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{7FC9B01B-9EC8-43A4-9A0C-EF1BCBE9BF02}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7FC9B01B-9EC8-43A4-9A0C-EF1BCBE9BF02}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7FC9B01B-9EC8-43A4-9A0C-EF1BCBE9BF02}.Debug|Default.ActiveCfg = Debug|Any CPU
+		{7FC9B01B-9EC8-43A4-9A0C-EF1BCBE9BF02}.Debug|Default.Build.0 = Debug|Any CPU
 		{7FC9B01B-9EC8-43A4-9A0C-EF1BCBE9BF02}.Debug|x64.ActiveCfg = Debug|x64
 		{7FC9B01B-9EC8-43A4-9A0C-EF1BCBE9BF02}.Debug|x64.Build.0 = Debug|x64
 		{7FC9B01B-9EC8-43A4-9A0C-EF1BCBE9BF02}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7FC9B01B-9EC8-43A4-9A0C-EF1BCBE9BF02}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7FC9B01B-9EC8-43A4-9A0C-EF1BCBE9BF02}.Release|Default.ActiveCfg = Release|Any CPU
+		{7FC9B01B-9EC8-43A4-9A0C-EF1BCBE9BF02}.Release|Default.Build.0 = Release|Any CPU
 		{7FC9B01B-9EC8-43A4-9A0C-EF1BCBE9BF02}.Release|x64.ActiveCfg = Release|x64
 		{7FC9B01B-9EC8-43A4-9A0C-EF1BCBE9BF02}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
@@ -27,5 +33,22 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {83EEFEA0-FAD0-4DAA-A512-97A3A9A6CD64}
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|Default = Debug|Default
+		Debug|x64 = Debug|x64
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|Default = Debug|Default
+		Release|Any CPU = Release|Any CPU
+		Release|Default = Release|Default
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
+		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
 	EndGlobalSection
 EndGlobal
