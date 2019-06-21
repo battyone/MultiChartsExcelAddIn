@@ -392,12 +392,26 @@ namespace ExcelAddIn5
                 }
             }
         }
-
+        
         /************  EVALUATE BUTTON  ************/
 
         private void Evaluate_Click(object sender, RibbonControlEventArgs e)
         {
+            Excel.Workbook actbook = Globals.ThisAddIn.Application.ActiveWorkbook;
 
+            Excel.Worksheet InputSheet = actbook.Sheets[1];
+
+            string FileName = InputSheet.Cells[8, 2].Value2;
+            double testingWeight = (double)InputSheet.Cells[13, 2].Value2;  // Testing Weight (in %)
+
+            StringBuilder sb = new StringBuilder();
+            sb.Append("eval;");
+
+            sb.Append(testingWeight.ToString() + ';');
+            sb.Append(FileName);
+
+            Directory.SetCurrentDirectory("C:\\MultiCharts");
+            Process.Start(Path.Combine(Directory.GetCurrentDirectory(), "MultiChartsClientCS.exe"), sb.ToString());
         }
 
         /************  FORECAST BUTTON  ************/
