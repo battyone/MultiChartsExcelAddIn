@@ -128,17 +128,12 @@ namespace ExcelAddIn5
             int Maxbars = (int)InputSheet.Cells[18, 2].Value2;             // Maxbars
             int Minbars = (int)InputSheet.Cells[17, 2].Value2;             // Minbars
 
-            object[,] price = new object[(int)size, 1];
-            object[,] date = new object[(int)size, 1];
-            object[,] time = new object[(int)size, 1];
-            object[,] value = new object[(int)size, 1];
-
-            price = DataRange3.Value2;
+            object[,] price = DataRange3.Value2;
             OutRange3.Value2 = price;
 
-            date = DataSheet.Range[DataSheet.Cells[2, 1], DataSheet.Cells[(int)size + 1, 1]].Value2;
-            time = DataSheet.Range[DataSheet.Cells[2, 2], DataSheet.Cells[(int)size + 1, 2]].Value2;
-
+            object[,] date = DataSheet.Range[DataSheet.Cells[2, 1], DataSheet.Cells[(int)size + 1, 1]].Value2;
+            object[,] time = DataSheet.Range[DataSheet.Cells[2, 2], DataSheet.Cells[(int)size + 1, 2]].Value2;
+            
             double[] trainingData = new double[(int)size];
             for (int i = 1; i < size + 1; i++)
             {
@@ -176,7 +171,7 @@ namespace ExcelAddIn5
             sb.Append(learningrate.ToString() + ';');
             sb.Append(momentum.ToString() + ';');
             sb.Append(Scale.ToString() + ';');
-            sb.Append((Optimizer.Equals("RMSProp")?1:0).ToString() + ';');
+            sb.Append((Optimizer.Equals("RMSProp") ? 1 : 0).ToString() + ';');
             sb.Append(testingPart.ToString() + ';');
             sb.Append(testingWeight.ToString());
 
@@ -235,6 +230,7 @@ namespace ExcelAddIn5
                 {
                     if (Ch_Indi != OutputSheet.Cells[1, 7].value2)
                     {
+                        object[,] value;
                         switch (Ch_Indi)
                         {
                             case AC:
@@ -392,12 +388,26 @@ namespace ExcelAddIn5
                 }
             }
         }
-
+        
         /************  EVALUATE BUTTON  ************/
 
         private void Evaluate_Click(object sender, RibbonControlEventArgs e)
         {
+            Excel.Workbook actbook = Globals.ThisAddIn.Application.ActiveWorkbook;
 
+            Excel.Worksheet InputSheet = actbook.Sheets[1];
+
+            string FileName = InputSheet.Cells[8, 2].Value2;
+            double testingWeight = (double)InputSheet.Cells[13, 2].Value2;  // Testing Weight (in %)
+
+            StringBuilder sb = new StringBuilder();
+            sb.Append("eval;");
+
+            sb.Append(testingWeight.ToString() + ';');
+            sb.Append(FileName);
+
+            Directory.SetCurrentDirectory("C:\\MultiCharts");
+            Process.Start(Path.Combine(Directory.GetCurrentDirectory(), "MultiChartsClientCS.exe"), sb.ToString());
         }
 
         /************  FORECAST BUTTON  ************/
@@ -412,24 +422,18 @@ namespace ExcelAddIn5
 
             double size = InputSheet.Cells[7, 2].Value2;
 
-            Excel.Range DataRange1 = DataSheet.Range[DataSheet.Cells[2, 1], DataSheet.Cells[(int)size + 1, 1]];
-
-            Excel.Range DataRange2 = DataSheet.Range[DataSheet.Cells[2, 2], DataSheet.Cells[(int)size + 1, 2]];
+//          Excel.Range DataRange1 = DataSheet.Range[DataSheet.Cells[2, 1], DataSheet.Cells[(int)size + 1, 1]];
+//          Excel.Range DataRange2 = DataSheet.Range[DataSheet.Cells[2, 2], DataSheet.Cells[(int)size + 1, 2]];
             
             int ticks = (int)InputSheet.Cells[22, 2].Value2;               // Number of Bars to forecast
             string FileName = InputSheet.Cells[8, 2].Value2;
 
-            object[,] date = new object[(int)size, 1];
-            object[,] time = new object[(int)size, 1];           
+            object[,] date = DataSheet.Range[DataSheet.Cells[2, 1], DataSheet.Cells[(int)size + 1, 1]].Value2;
+            object[,] time = DataSheet.Range[DataSheet.Cells[2, 2], DataSheet.Cells[(int)size + 1, 2]].Value2;
 
-            date = DataSheet.Range[DataSheet.Cells[2, 1], DataSheet.Cells[(int)size + 1, 1]].Value2;
-            time = DataSheet.Range[DataSheet.Cells[2, 2], DataSheet.Cells[(int)size + 1, 2]].Value2;
+            long lastDateTimeMinusOne = (Int64)(DateTime.Parse(string.Join(" ", date[(int)size - 2, 1].ToString(), TimeSpan.FromDays(Double.Parse(time[(int)size - 2, 1].ToString())))).Subtract(new DateTime(1970, 1, 1, 5, 30, 0)).TotalSeconds);
 
-            long lastDateTimeMinusOne = (Int64)(DateTime.Parse(string.Join(" ", date[(int)size - 2, 1].ToString(), TimeSpan.FromDays(Double.Parse(time[(int)size - 2, 1].ToString
-                    ()))).ToString()).Subtract(new DateTime(1970, 1, 1, 5, 30, 0)).TotalSeconds);
-
-            long lastDateTime = (Int64)(DateTime.Parse(string.Join(" ", date[(int)size - 1, 1].ToString(), TimeSpan.FromDays(Double.Parse(time[(int)size - 1, 1].ToString
-                    ()))).ToString()).Subtract(new DateTime(1970, 1, 1, 5, 30, 0)).TotalSeconds);
+            long lastDateTime = (Int64)(DateTime.Parse(string.Join(" ", date[(int)size - 1, 1].ToString(), TimeSpan.FromDays(Double.Parse(time[(int)size - 1, 1].ToString())))).Subtract(new DateTime(1970, 1, 1, 5, 30, 0)).TotalSeconds);
 
             StringBuilder sb = new StringBuilder();
             sb.Append("forecast;");            
