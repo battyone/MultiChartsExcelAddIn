@@ -12,7 +12,6 @@ namespace ExcelAddIn5
 
         private void Ribbon1_Load(object sender, RibbonUIEventArgs e)
         {
-
         }
 
         /************  TRAIN BUTTON  ************/
@@ -421,10 +420,7 @@ namespace ExcelAddIn5
             Excel.Worksheet DataSheet = actbook.Sheets[2];
 
             double size = InputSheet.Cells[7, 2].Value2;
-
-//          Excel.Range DataRange1 = DataSheet.Range[DataSheet.Cells[2, 1], DataSheet.Cells[(int)size + 1, 1]];
-//          Excel.Range DataRange2 = DataSheet.Range[DataSheet.Cells[2, 2], DataSheet.Cells[(int)size + 1, 2]];
-            
+           
             int ticks = (int)InputSheet.Cells[22, 2].Value2;               // Number of Bars to forecast
             string FileName = InputSheet.Cells[8, 2].Value2;
 
