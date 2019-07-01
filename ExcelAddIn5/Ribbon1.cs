@@ -132,7 +132,7 @@ namespace ExcelAddIn5
 
             object[,] date = DataSheet.Range[DataSheet.Cells[2, 1], DataSheet.Cells[(int)size + 1, 1]].Value2;
             object[,] time = DataSheet.Range[DataSheet.Cells[2, 2], DataSheet.Cells[(int)size + 1, 2]].Value2;
-            
+
             double[] trainingData = new double[(int)size];
             for (int i = 1; i < size + 1; i++)
             {
