@@ -4,12 +4,12 @@ using System;
 using System.IO;
 using System.Diagnostics;
 using System.Text;
+using System.Web.Script.Serialization;
 
 namespace ExcelAddIn5
 {
     public partial class Ribbon1
     { 
-
         private void Ribbon1_Load(object sender, RibbonUIEventArgs e)
         {
 
@@ -175,7 +175,28 @@ namespace ExcelAddIn5
             sb.Append(testingPart.ToString() + ';');
             sb.Append(testingWeight.ToString());
 
+            MultiCharts multiCharts = new MultiCharts
+            {
+                action = "train",
+                gpu = gpu.Equals("Yes") ? true : false,
+                data = trainingData,
+                date = dateArray,
+                fileName = FileName,
+                epochs = Epochs,
+                learningRate = learningrate,
+                momentum = momentum,
+                scale = Scale,
+                optimizer = Optimizer.Equals("RMSProp") ? 1 : 0,
+                testingPart = testingPart,
+                testingWeight = testingWeight
+            };
+
             Directory.SetCurrentDirectory("C:\\MultiCharts");
+
+            JavaScriptSerializer serializer = new JavaScriptSerializer();
+            string json = serializer.Serialize(multiCharts);
+            File.WriteAllText(Path.Combine(Directory.GetCurrentDirectory(), FileName + ".json"), json);
+
             Process.Start(Path.Combine(Directory.GetCurrentDirectory(), "MultiChartsClientCS.exe"), sb.ToString());
 
             if (isTrain == "Yes")
